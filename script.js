@@ -1,4 +1,3 @@
-
 const searchInput = document.getElementById('search-input');
 const searchBtn = document.getElementById('search-btn');
 const locationBtn = document.getElementById('location-btn');
@@ -13,10 +12,9 @@ const windSpeedElement = document.getElementById('wind-speed');
 const humidityElement = document.getElementById('humidity');
 const pressureElement = document.getElementById('pressure');
 const forecastContainer = document.getElementById('forecast');
-
+const themeToggle = document.getElementById('theme-toggle');
 const API_KEY = '07543e6ea864f92664ac29fdb4997c0f';
 
-// Initialize the app
 function init() {
   setCurrentDate();
   searchBtn.addEventListener('click', searchWeather);
@@ -24,24 +22,35 @@ function init() {
   searchInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') searchWeather();
   });
+
+  // Theme initialization
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+    themeToggle.textContent = '☀️';
+  }
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    themeToggle.textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+
   getWeatherByCity('New York');
 }
 
-// Set current date
 function setCurrentDate() {
   const now = new Date();
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   dateElement.textContent = now.toLocaleDateString('en-US', options);
 }
 
-// Search weather by city name
 function searchWeather() {
   const city = searchInput.value.trim();
   if (city) getWeatherByCity(city);
   else showError('Please enter a city name');
 }
 
-// Get weather by current location
 function getLocationWeather() {
   if (!navigator.geolocation) return showError('Geolocation not supported');
   loading.style.display = 'block';
@@ -51,7 +60,6 @@ function getLocationWeather() {
   );
 }
 
-// Get weather by city name
 function getWeatherByCity(city) {
   loading.style.display = 'block'; errorMessage.style.display = 'none';
   fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`)
@@ -62,7 +70,6 @@ function getWeatherByCity(city) {
     .catch(e => { loading.style.display = 'none'; showError(e.message); });
 }
 
-// Get weather by coordinates
 function getWeatherByCoords(lat, lon) {
   loading.style.display = 'block'; errorMessage.style.display = 'none';
   fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`)
@@ -73,7 +80,6 @@ function getWeatherByCoords(lat, lon) {
     .catch(e => { loading.style.display = 'none'; showError(e.message); });
 }
 
-// Display current weather
 function displayCurrentWeather(data) {
   locationElement.textContent = `${data.name}, ${data.sys.country}`;
   temperatureElement.textContent = `${Math.round(data.main.temp)}°C`;
@@ -84,7 +90,6 @@ function displayCurrentWeather(data) {
   pressureElement.textContent = `${data.main.pressure} hPa`;
 }
 
-// Display forecast
 function displayForecast(data) {
   forecastContainer.innerHTML = '';
   const forecasts = data.list.filter(item => item.dt_txt.includes('12:00:00'));
@@ -101,7 +106,6 @@ function displayForecast(data) {
   });
 }
 
-// Show error message
 function showError(msg) {
   errorMessage.textContent = msg;
   errorMessage.style.display = 'block';
