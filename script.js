@@ -23,7 +23,6 @@ function init() {
     if (e.key === 'Enter') searchWeather();
   });
 
-  // Theme initialization
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark');
     themeToggle.textContent = '☀️';
